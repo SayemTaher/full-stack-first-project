@@ -4,13 +4,19 @@ import mongoose from 'mongoose';
 
 async function main() {
   try {
-    await mongoose.connect(config.databaseURL as string);
+    console.log('Database URL:', config.databaseURL); // Debugging log
+
+    if (!config.databaseURL) {
+      throw new Error('DATABASE_URL is missing in the environment variables');
+    }
+
+    await mongoose.connect(config.databaseURL);
 
     app.listen(config.port, () => {
-      console.log(`Example app listening on port ${config.port}`);
+      console.log(`App listening on port ${config.port}`);
     });
   } catch (err) {
-    console.log(err);
+    console.error('Error starting the server:', err);
   }
 }
 main();

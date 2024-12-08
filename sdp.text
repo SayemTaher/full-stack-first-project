@@ -1,0 +1,4 @@
+Software design patter
+Interface -> Schema -> Model -> DBQUERY
+Route -> Controller -> Service -> Route
+sayemtaher@Sayems-iMac project-with-mongoose % ts-node-dev --respawn --transpile-only src/server.ts
