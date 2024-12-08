@@ -53,5 +53,5 @@ const studentSchema = new Schema<Student>({
   presentAdrress: { type: String, required: true },
   permanentAddress: { type: String, required: true },
 });
-// create a model 
-export const StudentModel = model<Student>('Student', studentSchema)
+// create a model
+export const StudentModel = model<Student>('Student', studentSchema);
