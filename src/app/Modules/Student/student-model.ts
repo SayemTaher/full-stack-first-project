@@ -1,4 +1,4 @@
-import { Schema, model, connect } from 'mongoose';
+import { Schema, model} from 'mongoose';
 import validator from 'validator';
 import {
   TGuardian,
@@ -7,9 +7,7 @@ import {
   StudentModel,
   UserName,
 } from './student-interface';
-import studentValidationSchema from './student-validation';
-import bcrypt from 'bcrypt'
-import config from '../../config';
+
 
 
 const userNameSchema = new Schema<UserName>({
@@ -55,8 +53,13 @@ const studentLocalGuardianSchema = new Schema<TLocalGuardian>({
   address: { type: String, required: true },
 });
 const studentSchema = new Schema<TStudent, StudentModel>({
+  user: {
+    type: Schema.Types.ObjectId,
+    required: [true, 'User id is required'],
+    unique: true,
+    ref : 'User'
+  },
   id: { type: String, required: true, unique: true },
-  password: { type: String, required: true, maxlength : 20 },
   name: {
     type: userNameSchema,
     required: true,
@@ -70,7 +73,7 @@ const studentSchema = new Schema<TStudent, StudentModel>({
     required: true,
   },
   dateOfBirth: {
-    type: String,
+    type: Date,
   },
   contactNo: { type: String, required: true },
   emergencyContact: { type: String, required: true },
@@ -95,12 +98,11 @@ const studentSchema = new Schema<TStudent, StudentModel>({
     type: studentLocalGuardianSchema,
     required: true,
   },
-  profileImg: { type: String },
-  isActive: {
-    type: String,
-    enum: ['active', 'blocked'],
-    default: 'active',
+  admissionSemester: {
+        type: Schema.Types.ObjectId,
+        ref: 'academic-semester'
   },
+  profileImg: { type: String },
   presentAddress: { type: String, required: true },
   permanentAddress: { type: String, required: true },
   isDeleted: {
@@ -124,28 +126,11 @@ studentSchema.statics.isUserExist = async function (id:string) {
   return existingUser
 }
 
-// creating a custom instance
-// studentSchema.methods.isUserExist = async function (id: string) {
-//   const existingUser = await Student.findOne({ id })
-//   return existingUser
-// }
-
 // mongoose middleware 
 
 // pre save middleware/hook -- for create and save
-studentSchema.pre('save', async function(next) {
 
-  console.log(this, 'pre hook : for saving data')
-  const user = this
-  user.password = await bcrypt.hash(user.password, Number(config.bcrypt_salt_rounds));
-  next();
-})
-// post save middleware/hook 
-studentSchema.post('save', function(doc, next) {
-  doc.password = '';
-  next()
-});
-// quesry middleware 
+// query middleware 
 
 studentSchema.pre('find', function (next) {
   this.find({isDeleted : {$ne : true}})

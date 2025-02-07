@@ -1,6 +1,9 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express , { Request, Response,  } from 'express';
 import cors from 'cors';
 import { StudentRoutes } from './app/Modules/Student/student-route';
+import { userRoutes } from './app/Modules/User/user-route';
+import globalErrorHandler from './app/middlewares/globalErrorHandler';
+import router from './app/routes';
 const app = express();
 // parser
 app.use(express.json());
@@ -8,17 +11,9 @@ app.use(express.json());
 app.use(cors());
 // application routes 
 
-app.use('/api/v1/students', StudentRoutes)
-
-
-// const check = (req: Request, res: Response, next: NextFunction) => {
-//   console.log(req.url, req.method, req.hostname);
-//   next();
-// };
-
-// app.get('/', check, (req: Request, res: Response, next: NextFunction) => {
-//   res.send('Testing server');
-//   next();
-// });
+app.use('/api/v1/students', router)
+app.use('/api/v1/users', router);
+app.use('/api/v1/semesters', router) // these are first routes
+app.use(globalErrorHandler) 
 
 export default app;

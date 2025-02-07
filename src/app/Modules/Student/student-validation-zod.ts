@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 // Guardian Schema
-const guardianSchema = z.object({
+const guardianValidationSchema = z.object({
   fatherName: z.string().nonempty('Father name is required'),
   fatherOccupation: z.string().nonempty('Father occupation is required'),
   fatherContactNo: z.string().nonempty('Father contact number is required'),
@@ -11,14 +11,14 @@ const guardianSchema = z.object({
 });
 
 // UserName Schema
-const userNameSchema = z.object({
+const userNameValidationSchema = z.object({
   firstName: z.string().nonempty('First name is required'),
   middleName: z.string().nonempty('Middle name is required'),
   lastName: z.string().nonempty('Last name is required'),
 });
 
 // LocalGuardian Schema
-const localGuardianSchema = z.object({
+const localguardianValidationSchema = z.object({
   name: z.string().nonempty('Local guardian name is required'),
   contactNo: z.string().nonempty('Local guardian contact number is required'),
   occupation: z.string().nonempty('Local guardian occupation is required'),
@@ -26,34 +26,38 @@ const localGuardianSchema = z.object({
 });
 
 // Main Student Schema
-const studentZodValidationSchema = z.object({
-  id: z.string().nonempty('ID is required'),
-  password : z.string(),
-  name: userNameSchema,
-  gender: z.enum(['male', 'female'], {
-    errorMap: () => ({ message: 'Gender must be either "male" or "female"' }),
-  }),
-  dateOfBirth: z.string().nonempty('Date of birth is required'),
-  contactNo: z.string().nonempty('Contact number is required'),
-  emergencyContact: z.string().nonempty('Emergency contact number is required'),
-  email: z
-    .string()
-    .email('Email must be a valid email address')
-    .nonempty('Email is required'),
-  bloodGroup: z
-    .enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])
-    .optional(),
-  guardian: guardianSchema,
-  localGuardian: localGuardianSchema,
-  profileImg: z.string().optional(), // Optional string for profile image
-  isActive: z.enum(['active', 'blocked'], {
-    errorMap: () => ({
-      message: 'isActive must be either "active" or "blocked"',
+const studentCreateZodValidationSchema = z.object({
+  body: z.object({
+    password: z.string(),
+    student: z.object({
+      name: userNameValidationSchema,
+      gender: z.enum(['male', 'female'], {
+        errorMap: () => ({
+          message: 'Gender must be either "male" or "female"',
+        }),
+      }),
+      dateOfBirth: z.string().optional(),
+      contactNo: z.string().nonempty('Contact number is required'),
+      emergencyContact: z
+        .string()
+        .nonempty('Emergency contact number is required'),
+      email: z
+        .string()
+        .email('Email must be a valid email address')
+        .nonempty('Email is required'),
+      bloodGroup: z
+        .enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])
+        .optional(),
+      guardian: guardianValidationSchema,
+      admissionSemester : z.string(),
+      localGuardian: localguardianValidationSchema,
+      profileImg: z.string().optional(), // Optional string for profile image
+      presentAddress: z.string().nonempty('Present address is required'),
+      permanentAddress: z.string().nonempty('Permanent address is required'),
     }),
   }),
-  presentAddress: z.string().nonempty('Present address is required'),
-  permanentAddress: z.string().nonempty('Permanent address is required'),
-  isDeleted : z.boolean()
 });
 
-export default studentZodValidationSchema;
+export const studentSchemas = {
+  studentCreateZodValidationSchema
+} 

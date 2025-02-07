@@ -4,7 +4,6 @@ import mongoose from 'mongoose';
 
 async function main() {
   try {
-    console.log('Database URL:', config.databaseURL); // Debugging log
 
     if (!config.databaseURL) {
       throw new Error('DATABASE_URL is missing in the environment variables');
