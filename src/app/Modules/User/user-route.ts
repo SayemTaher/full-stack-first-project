@@ -11,7 +11,7 @@ const router = express.Router();
 
 
 // this route is the final route for the url
-router.post('/create-student',validationSchemas.validateRequest(studentSchemas.studentCreateZodValidationSchema), UserController.createStudent);
+router.post('/create-user',validationSchemas.validateRequest(studentSchemas.studentCreateZodValidationSchema), UserController.createStudent);
 
 
 export const userRoutes = router;

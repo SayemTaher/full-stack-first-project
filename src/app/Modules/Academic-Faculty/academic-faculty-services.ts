@@ -9,12 +9,12 @@ const createAcademicFacultyInDb = async (payload: TAcademicFaculty) => {
 };
 
 const getAllAcademicFacultiesFromDb = async () => {
-  const data =await AcademicFaculty.find();
+  const data =await AcademicFaculty.find()
   return data;
 };
 
 const getSingleAcademicFacultyDataFromDb = async (id: string) => {
-  const data = await AcademicFaculty.findById(id);
+  const data = await AcademicFaculty.findById(id)
   return data;
 };
 

@@ -102,6 +102,10 @@ const studentSchema = new Schema<TStudent, StudentModel>({
         type: Schema.Types.ObjectId,
         ref: 'academic-semester'
   },
+  academicDepartment: {
+    type: Schema.Types.ObjectId,
+    ref:'academic-department'
+  },
   profileImg: { type: String },
   presentAddress: { type: String, required: true },
   permanentAddress: { type: String, required: true },
@@ -132,15 +136,15 @@ studentSchema.statics.isUserExist = async function (id:string) {
 
 // query middleware 
 
-studentSchema.pre('find', function (next) {
-  this.find({isDeleted : {$ne : true}})
-  next()
-})
+// studentSchema.pre('find', function (next) {
+//   this.find({isDeleted : {$ne : true}})
+//   next()
+// })
 
-studentSchema.pre('findOne', function (next) {
-  this.find({ isDeleted: { $ne: true } });
-  next();
-});
+// studentSchema.pre('findOne', function (next) {
+//   this.find({ isDeleted: { $ne: true } });
+//   next();
+// });
 studentSchema.pre('aggregate', function (next) {
 this.pipeline().unshift({$match : {isDeleted : {$ne : true}}})
 next();
