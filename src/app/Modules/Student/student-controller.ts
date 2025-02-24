@@ -19,7 +19,7 @@ const getAllStudents : RequestHandler = catchAsync(async (req, res ) => {
 
 // single student
 const getAStudent = catchAsync(async(req, res ) => {
-  const studentId = req.params.studentId;
+  const studentId = req.params.id;
   if (!studentId) {
     throw new Error('Student Id could not be found')
   }
@@ -33,7 +33,7 @@ const getAStudent = catchAsync(async(req, res ) => {
 }) 
 // delete a student
 const deleteAStudent = catchAsync(async (req, res) => {
-  const studentId = req.params.studentId;
+  const studentId = req.params.id;
   if (!studentId) {
      throw new Error('Student Id could not be found');
   }
@@ -46,7 +46,7 @@ const deleteAStudent = catchAsync(async (req, res) => {
   });
 });
 const updateAStudent = catchAsync(async (req, res) => {
-  const studentId = req.params.studentId;
+  const studentId = req.params.id;
   const data = req.body.student
   if (!studentId) {
     throw new Error('Student Id could not be found');

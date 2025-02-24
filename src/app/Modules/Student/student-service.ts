@@ -1,72 +1,22 @@
-// import { Student } from './student-interface';
+
 import mongoose, { ObjectId } from 'mongoose';
 import AppError from '../../CustomError/app-error';
 import { TStudent } from './student-interface';
 import { Student } from './student-model';
 import httpStatus from 'http-status';
 import { User } from '../User/user-model';
+import QueryBuilder from '../../Query-Builder/QueryBuilder';
+import { studentSearchableFields } from './student.consts';
 
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
-  // search here
-  // format for email : {email : {$regex : query.searchTerm, $options : i}}
-  // const queryObj = { ...query}
-  // let searchableQueries = ['email', 'name.firstName', 'presentAddress','fields'];
-  // let searchTerm = ''
-  // if (query?.searchTerm) {
-  //   searchTerm = query?.searchTerm as string;
-  // }
-  // const seacrhQuery = Student.find({
-  //   $or: searchableQueries.map(field => ({
-  //     [field]: {
-  //       $regex: searchTerm,
-  //       $options: 'i',
-  //     },
-  //   })),
-  // });
-  // // filtering
-  // const excludeFields = ['searchTerm','sort','limit','page','fields']
-  // excludeFields.forEach((el) => delete queryObj[el])
-  // // console.log({query},{queryObj})
-  // const filter = seacrhQuery.find(queryObj).populate('admissionSemester').populate({
-  //   path: 'academicDepartment',
-  //   populate: {
-  //     path:'academicFaculty'
-  //   }
-  // });
+ 
+  const studnetQuery = new QueryBuilder(Student.find(), query).search(studentSearchableFields).filter().sort().paginate().fields();
+  const result = await studnetQuery.modelQuery
+  return result
 
-  // let sort = '-createdAt'
-  // if (query?.sort) {
-  //   sort = query.sort as string
-  // }
-  // let page = 1
-  // let limit = 1
-  // let skip = 0
-  // let fields = '-__v'
-
-  // if (query.limit) {
-  //   limit = Number(query.limit)
-  // }
-  // if (query.page) {
-  //   page = Number(query.page)
-  //   skip = (page-1) * limit
-  // }
-  // const sortQuery = filter.sort(sort)
-  // const paginateQuery = sortQuery.skip(skip)
-  // const limitQuery = paginateQuery.limit(limit)
-  
-
-  // if (query.fields) {
-  //   fields = (query.fields as string).split(',').join(' ');
-  // }
-  // const fieldQuery = await limitQuery.select(fields)
-
-  // return fieldQuery
-  
-};
+}
 const getAStudentsFromDB = async (id : string) => {
-  // const result = await Student.findOne({ id });
-  // using aggregate 
-  const result = await Student.findOne({ id })
+  const result = await Student.findById(id )
     .populate('admissionSemester')
     .populate({
       path: 'academicDepartment',
@@ -76,6 +26,7 @@ const getAStudentsFromDB = async (id : string) => {
     });
   return result;
 };
+
 const updateAStudentsFromDB = async (id: string, payload: Partial<TStudent>) => {
   
   const { name,...remainingData } = payload
@@ -90,7 +41,7 @@ const updateAStudentsFromDB = async (id: string, payload: Partial<TStudent>) => 
   }
   // this goes for other non-primitive fields as well
 
-  const result = await Student.findOneAndUpdate({ id }, requestedModifiedData, { new: true, runValidators : true })
+  const result = await Student.findByIdAndUpdate(id , requestedModifiedData, { new: true, runValidators : true })
   return result;
 };
 // const deleteAStudentsFromDB = async (id: string) => {
@@ -106,12 +57,15 @@ const deleteAStudentsFromDB = async (id: string) => {
   try {
 
     session.startTransaction()
-    const deletedStudent = await Student.findOneAndUpdate({ id }, { isDeleted: true }, { new: true, session });
+    const deletedStudent = await Student.findByIdAndUpdate(id, { isDeleted: true }, { new: true, session });
+    
     if (!deletedStudent) {
       throw new AppError(httpStatus.BAD_REQUEST,'Failed to delete student')
     }
-    const deletedUser = await User.findOneAndUpdate(
-      { id },
+    const userId = await deletedStudent.user;
+
+    const deletedUser = await User.findByIdAndUpdate(
+      userId ,
       { isDeleted: true },
       { new: true, session },
     );
@@ -129,7 +83,6 @@ const deleteAStudentsFromDB = async (id: string) => {
     throw new Error('Failed to delete user')
   }
 }
-
 
 export const StudentServices = {
   getAllStudentsFromDB,
