@@ -1,0 +1,1 @@
+export const courseSearchableQueries = ['title','prefix','code']
